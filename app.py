@@ -1,23 +1,36 @@
-
 import torch
 import gradio as gr
 import re
 from transformers import AutoTokenizer
+from huggingface_hub import hf_hub_download
 
-MODEL_PATH = "quantized_model.pt"
+MODEL_REPO = "onurtaysun/SWE015-Chat-Moderation-2026"
+
+MODEL_PATH = hf_hub_download(
+    repo_id=MODEL_REPO,
+    filename="quantized_model.pt"
+)
+
 TOKENIZER_PATH = "moderation_tokenizer"
 
 def clean_text(text):
     text = text.lower()
-    text = re.sub(r"http\\S+|www\\S+", " ", text)
+    text = re.sub(r"http\S+|www\S+", " ", text)
     text = re.sub(r"<.*?>", " ", text)
-    text = re.sub(r"(.)\\1{2,}", r"\\1\\1", text)
-    text = re.sub(r"[^a-z0-9\\s!?']", " ", text)
-    text = re.sub(r"\\s+", " ", text).strip()
+    text = re.sub(r"(.)\1{2,}", r"\1\1", text)
+    text = re.sub(r"[^a-z0-9\s!?']", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
     return text
 
-tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_PATH)
-model = torch.load(MODEL_PATH, map_location="cpu", weights_only=False)
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_REPO
+)
+
+model = torch.load(
+    MODEL_PATH,
+    map_location="cpu",
+    weights_only=False
+)
 model.eval()
 
 def predict_moderation(text):
@@ -25,6 +38,7 @@ def predict_moderation(text):
         return {"Please enter a message": 1.0}
 
     cleaned_text = clean_text(text)
+
     inputs = tokenizer(
         cleaned_text,
         return_tensors="pt",
