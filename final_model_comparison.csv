@@ -1,0 +1,5 @@
+Model,Accuracy,Macro-F1,Model Size (MB),Average Latency (ms)
+TF-IDF + Logistic Regression,0.9386,0.8472,,1.3533407100112527
+Word2Vec + Feedforward Neural Network,0.9534,0.8487,,1.3407676300994353
+DistilBERT,0.9597,0.8905,255.45,7.366326290102734
+Quantized DistilBERT,0.964,0.8941,132.29,114.41597740000361
